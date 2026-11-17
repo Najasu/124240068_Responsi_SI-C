@@ -60,8 +60,8 @@ class _MainPageState extends State<MainPage> {
         destinations: [
           const NavigationDestination(
             icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people),
-            label: 'Characters',
+            selectedIcon: Icon(Icons.shopping_basket_outlined),
+            label: 'Products',
           ),
           NavigationDestination(
             icon: Obx(() => Badge(
@@ -69,8 +69,8 @@ class _MainPageState extends State<MainPage> {
                   label: Text('${fav.favorites.length}'),
                   child: const Icon(Icons.favorite_border),
                 )),
-            selectedIcon: const Icon(Icons.favorite),
-            label: 'Favorites',
+            selectedIcon: const Icon(Icons.favorite_border_outlined),
+            label: 'Wishlist',
           ),
         ],
       ),
