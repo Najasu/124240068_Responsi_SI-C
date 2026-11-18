@@ -1,57 +1,60 @@
 class Product {
   final int id;
-  final String name;
+  final String title;
   final String description;
-  final String price;
-  final String rating;
-  final String stock;
-  final String brand;
   final String category;
-  final String discount;
-  final String images;
-  final String reviews;
+  final String brand;
+  final double price;
+  final double discountPercentage;
+  final double rating;
+  final int stock;
+  final String thumbnail;
+  final List<String> images;
 
   Product({
     required this.id,
-    required this.name,
+    required this.title,
     required this.description,
+    required this.category,
+    required this.brand,
     required this.price,
+    required this.discountPercentage,
     required this.rating,
     required this.stock,
-    required this.brand,
-    required this.category,
-    required this.discount,
+    required this.thumbnail,
     required this.images,
-    required this.reviews,
   });
+
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
-      name: json['name'] ?? '',
+      title: json['title'] ?? '',
       description: json['description'] ?? '',
-      price: json['price'] ?? '',
-      rating: json['rating'] ?? '',
-      stock: json['stock'] ?? '',
+      category: json['category'] ?? '',
       brand: json['brand'] ?? '',
-      category: json['category'] ?? [],
-      discount: json['discount'] ?? [],
-      images: json['images'] ?? [],
-      reviews: json['reviews'] ?? [],
+      price: (json['price'] as num?)?.toDouble() ?? 0,
+      discountPercentage: (json['discountPercentage'] as num?)?.toDouble() ?? 0,
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
+      stock: (json['stock'] as num?)?.toInt() ?? 0,
+      thumbnail: json['thumbnail'] ?? '',
+      images: List<String>.from(json['images'] ?? []),
     );
   }
 
-  // Untuk menyimpan favorit (bentuknya sama dengan JSON API)
+  bool get hasDiscount => discountPercentage > 0;
+  double get priceAfterDiscount => price * (1 - discountPercentage / 100);
+
   Map<String, dynamic> toJson() => {
         'id': id,
-        'name': name,
+        'title': title,
         'description': description,
+        'category': category,
+        'brand': brand,
         'price': price,
+        'discountPercentage': discountPercentage,
         'rating': rating,
         'stock': stock,
-        'brand': brand,
-        'category': category,
-        'discount' : discount,
-        'images' : images,
-        'reviews' : reviews,   
+        'thumbnail': thumbnail,
+        'images': images,
       };
 }

@@ -3,62 +3,51 @@ import 'package:http/http.dart' as http;
 import '../models/product.dart';
 
 class ApiService {
-  static const host = 'dummyjson.com/products';
+  static const host = 'dummyjson.com';
+  static const limit = '200';
 
-  static Future<Map<String, dynamic>?> getPage(
-    int page,
-    String status,
-    String name,
-  ) async {
-    final uri = Uri.https(host, '/category-list', {
-      'page': '$page',
-      if (status != '') 'status': status,
-      if (name != '') 'name': name,
-    });
+  static Future<dynamic> get(String path, [Map<String, String>? query]) async {
+    final uri = Uri.https(host, path, query);
     final response = await http.get(uri).timeout(const Duration(seconds: 15));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
-    } else if (response.statusCode == 404) {
-      return null;
-    } else {
-      throw Exception('Failed to load products');
     }
+    throw Exception('Failed to load $path (${response.statusCode})');
   }
 
   static Future<List<Product>> getProducts({
     String category = '',
-    String name = '',
+    String query = '',
   }) async {
-    final first = await getPage(1, category, name);
-    if (first == null) return [];
-
-    final int totalPages = first['info']['pages'];
-    List<Product> all = [];
-    for (var e in first['results']) {
-      all.add(Product.fromJson(e));
+    String path = '/products';
+    if (query != '') {
+      path = '/products/search';
+    } else if (category != '') {
+      path = '/products/category/$category';
     }
 
-    final others = await Future.wait([
-      for (int p = 2; p <= totalPages; p++) getPage(p, category, name),
-    ]);
-    for (var data in others) {
-      if (data == null) continue;
-      for (var e in data['results']) {
-        all.add(Product.fromJson(e));
-      }
+    final data = await get(path, {
+      'limit': limit,
+      if (query != '') 'q': query,
+    });
+
+    List results = data['products'];
+    var list = results.map((e) => Product.fromJson(e)).toList();
+
+    if (query != '' && category != '') {
+      list = list.where((p) => p.category == category).toList();
     }
-    return all;
+    return list;
   }
 
   static Future<Product> getProduct(int id) async {
-    final uri = Uri.https(host, '/{id}$id');
-    final response = await http.get(uri).timeout(const Duration(seconds: 15));
+    final data = await get('/products/$id');
+    return Product.fromJson(data);
+  }
 
-    if (response.statusCode == 200) {
-      return Product.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load product');
-    }
+  static Future<List<String>> getCategories() async {
+    final data = await get('/products/category-list');
+    return List<String>.from(data);
   }
 }

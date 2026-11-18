@@ -1,67 +1,61 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../utils/helpers.dart';
 
-class ProductImages extends StatelessWidget {
-  const ProductImages({
+class ProductImage extends StatelessWidget {
+  const ProductImage({
     super.key,
     required this.url,
-    required this.width,
-    required this.height,
-    this.radius = 12,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
   });
 
   final String url;
-  final double width;
-  final double height;
-  final double radius;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: Image.network(
-        url,
+    return Image.network(
+      url,
+      width: width,
+      height: height,
+      fit: fit,
+      webHtmlElementStrategy: WebHtmlElementStrategy.prefer, 
+      loadingBuilder: (context, child, progress) => progress == null
+          ? child
+          : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      errorBuilder: (context, error, stack) => Container(
         width: width,
         height: height,
-        fit: BoxFit.cover,
-        webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
-        errorBuilder: (context, error, stack) => Container(
-          width: width,
-          height: height,
-          color: Colors.grey.shade300,
-          child: const Icon(Icons.broken_image_outlined),
-        ),
+        color: Colors.grey.withValues(alpha: 0.2),
+        child: const Icon(Icons.broken_image_outlined),
       ),
     );
   }
 }
 
-class CategoryBadge extends StatelessWidget {
-  const CategoryBadge({super.key, required this.category});
+class DiscountBadge extends StatelessWidget {
+  const DiscountBadge({super.key, required this.text});
 
-  final String category;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.red.shade600,
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.circle, size: 8),
-          const SizedBox(width: 6),
-          Text(
-            category,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
